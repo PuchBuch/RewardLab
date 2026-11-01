@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+{% include "admin/_bar.html" %}
+<h1>Admin <span class="grad">panel</span></h1>
+<div class="grid stats">
+  <div class="card"><h3>Members</h3><div class="big">{{ s.users }}</div><span class="muted">+{{ s.new }} in 24 h</span></div>
+  <div class="card"><h3>Banned</h3><div class="big">{{ s.banned }}</div></div>
+  <div class="card"><h3>Points in circulation</h3><div class="big">{{ s.points }}</div></div>
+  <div class="card"><h3>Claims today</h3><div class="big">{{ s.claims }}</div></div>
+  <div class="card"><h3>Blackjack hands today</h3><div class="big">{{ s.hands }}</div></div>
+  <div class="card"><h3>Blackjack house result today</h3><div class="big">{{ '+' if s.house > 0 }}{{ s.house }}</div></div>
+</div>
+<div class="card">
+  <h3>Members</h3>
+  <form class="search" method="get">
+    <input type="text" name="q" value="{{ q }}" maxlength="20" placeholder="Search by username">
+    <button class="btn ghost">Search</button>
+  </form>
+  <div style="overflow-x:auto">
+  <table>
+    <tr><th>ID</th><th>Member</th><th>Points</th><th>Friends</th><th>Joined</th><th>Status</th></tr>
+    {% for m in members %}
+    <tr><td class="mono">{{ m.id }}</td><td><a href="{{ url_for('admin.user', uid=m.id) }}"><b>{{ m.username }}</b></a></td>
+        <td>{{ m.points }}</td><td>{{ m.active }}/{{ m.invited }}</td><td class="muted">{{ m.created[:10] }}</td>
+        <td>{% if m.is_admin %}<span class="tag on">Admin</span>{% elif m.banned %}<span class="tag bad">Banned</span>
+            {% else %}<span class="tag off">OK</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+  {% if not members %}<p class="muted">Nothing found.</p>{% endif %}
+</div>
+<div class="grid">
+  <div class="card">
+    <h3>Shared networks (possible multi-accounts)</h3>
+    {% for n in nets %}
+      <div class="note"><div>{% for name in n.names.split(',') %}<a href="{{ url_for('admin.index', q=name) }}">{{ name }}</a>{{ ', ' if not loop.last }}{% endfor %}</div>
+        <span class="mono">{{ n.reg_net[:8] }}… · {{ n.n }} accounts</span></div>
+    {% else %}<p class="muted">No shared networks.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>Audit log</h3>
+    {% for a in log %}
+      <div class="note"><div><b>{{ a.admin_name }}</b> · {{ a.action }}{% if a.target %} → {{ a.target }}{% endif %}
+        {% if a.details %}<br><span class="muted">{{ a.details }}</span>{% endif %}</div><span>{{ a.at[:16].replace('T', ' ') }}</span></div>
+    {% else %}<p class="muted">No actions yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

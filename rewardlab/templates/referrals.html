@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Friends{% endblock %}
+{% block content %}
+<h1>Invite <span class="grad">friends</span></h1>
+<p class="muted">Earn a share of everything your friends earn. Their rewards are never reduced.</p>
+<div class="grid stats">
+  <div class="card"><h3>Your level</h3><div class="big grad">{{ tier[2] }}</div>
+    <span class="muted">{{ (tier[1] * 100)|int }}% of friends' earnings</span></div>
+  <div class="card"><h3>Active friends</h3><div class="big">{{ active }}</div>
+    <span class="muted">of {{ friends|length }} invited</span></div>
+  <div class="card"><h3>Earned from friends</h3><div class="big">{{ earned }}</div>
+    <span class="muted">points in total</span></div>
+</div>
+<div class="card">
+  <h3>Your invite link</h3>
+  <div class="row">
+    <input id="link" type="text" readonly value="{{ link }}" onclick="this.select()">
+    <button class="btn" type="button" data-copy="link">Copy</button>
+  </div>
+  {% if nxt %}
+    <div class="bar"><i style="width:{{ (active * 100 // nxt[0]) }}%"></i></div>
+    <span class="muted">{{ nxt[0] - active }} more active friend(s) to reach
+      <b>{{ nxt[2] }}</b> ({{ (nxt[1] * 100)|int }}%)</span>
+  {% else %}
+    <p class="muted">You have reached the highest level. 🏆</p>
+  {% endif %}
+  <div class="tiers">
+    {% for t in tiers %}
+      <div class="{{ 'cur' if t == tier }}"><b>{{ (t[1] * 100)|int }}%</b>{{ t[2] }} · {{ t[0] }}+ friends</div>
+    {% endfor %}
+  </div>
+</div>
+<div class="grid">
+  <div class="card">
+    <h3>How it works</h3>
+    <ol class="steps">
+      <li>Share your link. A friend signs up with it.</li>
+      <li>Every time they claim a bonus or solve the quiz, you get <b>your level's share</b> on top.</li>
+      <li>After their <b>{{ claims_needed }}rd claim</b> they become active: you get <b>+{{ bonus_inviter }}</b>, they get <b>+{{ bonus_friend }}</b>.</li>
+      <li>More active friends unlock a higher share.</li>
+      <li>Every week the top inviters win prizes: <a href="{{ url_for('main.leaderboard', tab='week') }}">weekly contest →</a></li>
+    </ol>
+    <p class="muted">Invites from your own network do not count. <a href="{{ url_for('main.rules') }}#fair">Fair play rules →</a></p>
+  </div>
+  <div class="card">
+    <h3>Your friends</h3>
+    {% if friends %}
+    <table>
+      <tr><th>Friend</th><th>Status</th><th>Earned for you</th></tr>
+      {% for f in friends %}
+      <tr><td>{{ f.username }}</td>
+          <td>{% if f.ref_activated %}<span class="tag on">Active</span>
+              {% else %}<span class="tag off">{{ f.claims }}/{{ claims_needed }} claims</span>{% endif %}</td>
+          <td class="plus">+{{ f.earned }}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}<p class="muted">No friends yet. Share your link to get started!</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

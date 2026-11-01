@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Hi, <span class="grad">{{ u.username }}</span></h1>
+<p class="muted">Here is how you are doing today.</p>
+{% if notes %}
+<div class="card" style="margin-top:20px">
+  <h3>Notifications</h3>
+  {% for n in notes %}
+    <div class="note {{ 'new' if not n.seen }}">{{ n.text }}<span>{{ n.at[:16].replace('T', ' ') }} UTC</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+<div class="grid stats">
+  <div class="card"><h3>Points</h3><div class="big grad">{{ u.points }}</div></div>
+  <div class="card"><h3>Daily streak</h3><div class="big">{{ u.streak }} 🔥</div><span class="muted">days in a row</span></div>
+  <div class="card"><h3>Friends invited</h3><div class="big">{{ refs }}</div></div>
+</div>
+<div class="card claim">
+  <h3 id="label">Next bonus in</h3>
+  <div id="timer" class="timer" data-wait="{{ wait }}">--:--</div>
+  <form method="post" action="{{ url_for('account.claim') }}">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button id="claim" class="btn xl" {% if wait > 0 %}disabled{% endif %}>Claim bonus</button>
+  </form>
+</div>
+<div class="grid">
+  <div class="card">
+    <h3>Your invite link</h3>
+    <input type="text" readonly value="{{ link }}" onclick="this.select()">
+    <p class="muted">You earn {{ share }}% of your friends' rewards, on top of theirs.
+       <a href="{{ url_for('account.referrals') }}">Referral program →</a></p>
+  </div>
+  <div class="card">
+    <h3>Recent activity</h3>
+    {% if events %}
+    <table>{% for e in events %}
+      <tr><td>{{ e.kind }}</td><td class="{{ 'plus' if e.amount > 0 else 'minus' }}">{{ '+' if e.amount > 0 }}{{ e.amount }}</td>
+          <td class="muted">{{ e.at[:16].replace('T', ' ') }}</td></tr>
+    {% endfor %}</table>
+    {% else %}<p class="muted">Nothing yet. Make your first claim!</p>{% endif %}
+  </div>
+</div>
+<form method="post" action="{{ url_for('auth.delete_account') }}" onsubmit="return confirm('Delete your account and all data?');">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <button class="btn danger">Delete my account and data</button>
+</form>
+{% endblock %}

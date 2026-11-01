@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ t.username }} · Admin{% endblock %}
+{% block content %}
+{% include "admin/_bar.html" %}
+<p><a href="{{ url_for('admin.index') }}">← All members</a></p>
+<h1>{{ t.username }}
+  {% if t.is_admin %}<span class="tag on">Admin</span>{% endif %}
+  {% if t.banned %}<span class="tag bad">Banned</span>{% endif %}</h1>
+<div class="grid stats">
+  <div class="card"><h3>Points</h3><div class="big grad">{{ t.points }}</div></div>
+  <div class="card"><h3>Streak</h3><div class="big">{{ t.streak }}</div></div>
+  <div class="card"><h3>Friends</h3><div class="big">{{ active }}/{{ invited }}</div><span class="muted">active / invited</span></div>
+  <div class="card"><h3>Invited by</h3><div class="big" style="font-size:20px">{{ referrer or '—' }}</div></div>
+  <div class="card"><h3>Joined</h3><div class="big" style="font-size:20px">{{ t.created[:10] }}</div></div>
+  <div class="card"><h3>Same network</h3><div class="big">{{ same_net }}</div><span class="muted">other accounts</span></div>
+</div>
+<div class="card">
+  <h3>Actions</h3>
+  {% if t.is_admin %}
+    <p class="muted">Admin accounts cannot be changed from the panel. Use <span class="mono">python app.py remove-admin</span> first.</p>
+  {% else %}
+  <div class="actions-grid">
+    <form method="post" action="{{ url_for('admin.action', uid=t.id, action='adjust') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <label>Adjust points (use minus to remove)</label>
+      <input type="number" name="amount" min="-100000" max="100000" required>
+      <label>Reason (logged)</label>
+      <input type="text" name="reason" maxlength="200" required>
+      <p><button class="btn">Apply</button></p>
+    </form>
+    <div>
+      <form method="post" action="{{ url_for('admin.action', uid=t.id, action='unban' if t.banned else 'ban') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <label>{{ 'Restore access' if t.banned else 'Suspend account (logs the user out)' }}</label>
+        <button class="btn {{ 'ghost' if t.banned else 'danger' }}">{{ 'Unban' if t.banned else 'Ban' }}</button>
+      </form>
+      {% if referrer %}
+      <form method="post" action="{{ url_for('admin.action', uid=t.id, action='unlink') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <label>Remove the referral link to {{ referrer }}</label>
+        <button class="btn ghost">Unlink referral</button>
+      </form>
+      {% endif %}
+    </div>
+    <form method="post" action="{{ url_for('admin.action', uid=t.id, action='delete') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <label>Delete account and all data. Type <b>{{ t.username }}</b> to confirm</label>
+      <input type="text" name="confirm" maxlength="20" required autocomplete="off">
+      <p><button class="btn danger">Delete permanently</button></p>
+    </form>
+  </div>
+  {% endif %}
+</div>
+<div class="grid">
+  <div class="card">
+    <h3>Recent activity</h3>
+    <table>{% for e in events %}
+      <tr><td>{{ e.kind }}</td><td class="{{ 'plus' if e.amount > 0 else 'minus' }}">{{ '+' if e.amount > 0 }}{{ e.amount }}</td>
+          <td class="muted">{{ e.at[:16].replace('T', ' ') }}</td></tr>
+    {% endfor %}</table>
+    {% if not events %}<p class="muted">No activity.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h3>Admin actions on this account</h3>
+    {% for a in log %}
+      <div class="note"><div><b>{{ a.admin_name }}</b> · {{ a.action }}{% if a.details %}<br><span class="muted">{{ a.details }}</span>{% endif %}</div>
+        <span>{{ a.at[:16].replace('T', ' ') }}</span></div>
+    {% else %}<p class="muted">None.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

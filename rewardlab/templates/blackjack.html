@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Blackjack{% endblock %}
+{% block content %}
+{% macro card(c) -%}
+  {%- if c.hidden -%}<div class="pcard back {{ 'deal' if c.new }}" style="--d:{{ c.d }}"></div>
+  {%- else -%}<div class="pcard {{ 'red' if c.red }} {{ 'deal' if c.new }}" style="--d:{{ c.d }}">
+    <span class="tl">{{ c.r }}<br>{{ c.s }}</span><span class="mid">{{ c.s }}</span><span class="br">{{ c.r }}<br>{{ c.s }}</span></div>
+  {%- endif -%}
+{%- endmacro %}
+<h1>Black<span class="grad">jack</span></h1>
+<p class="muted">Beat the dealer by getting closer to 21. Virtual points only, just for fun.
+  <a href="{{ url_for('main.rules') }}#blackjack">Rules →</a></p>
+<div class="bj-table">
+  <div class="hand">
+    <div class="hand-label">Dealer {% if dealer %}<span class="hand-val">{{ dealer_val }}</span>{% endif %}</div>
+    <div class="cards">{% for c in dealer %}{{ card(c) }}{% endfor %}</div>
+  </div>
+  {% if outcome %}
+    <div class="result {{ outcome.kind }}">{{ outcome.title }}<small>{{ outcome.sub }}</small></div>
+  {% else %}
+    <div class="felt-text">BLACKJACK PAYS 3 TO 2 · DEALER STANDS ON 17</div>
+  {% endif %}
+  <div class="hand">
+    <div class="cards">{% for c in player %}{{ card(c) }}{% endfor %}</div>
+    <div class="hand-label">You {% if player %}<span class="hand-val">{{ player_val }}</span>{% endif %}
+      {% if playing %}<span class="bet-chip">{{ bet }}</span>{% endif %}</div>
+  </div>
+
+  {% if playing %}
+  <form class="bj-controls" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button class="btn" formaction="{{ url_for('blackjack.action', action='hit') }}">Hit</button>
+    <button class="btn ghost" formaction="{{ url_for('blackjack.action', action='stand') }}">Stand</button>
+    {% if can_double %}
+    <button class="btn gold" formaction="{{ url_for('blackjack.action', action='double') }}">Double ×2</button>
+    {% endif %}
+  </form>
+  {% else %}
+  <form method="post" action="{{ url_for('blackjack.action', action='deal') }}">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <div class="chips">
+      {% for c in chips %}
+      <label><input type="radio" name="bet" value="{{ c }}" {{ 'checked' if c == sel }} {{ 'disabled' if c > points }}>
+        <span class="chip c{{ c }}">{{ c }}</span></label>
+      {% endfor %}
+    </div>
+    <div class="bj-controls">
+      <button class="btn xl" {{ 'disabled' if points < chips[0] }}>{{ 'Deal again' if outcome else 'Deal cards' }}</button>
+    </div>
+  </form>
+  {% if points < chips[0] %}
+    <p class="bj-balance">Not enough points for a bet. <a href="{{ url_for('account.dashboard') }}">Claim your hourly bonus →</a></p>
+  {% endif %}
+  {% endif %}
+  <div class="bj-balance">Balance: <b>{{ points }}</b> points</div>
+</div>
+
+<div class="grid stats">
+  <div class="card"><h3>Hands played</h3><div class="big">{{ st.hands }}</div></div>
+  <div class="card"><h3>Win rate</h3><div class="big">{{ st.rate }}%</div></div>
+  <div class="card"><h3>Net result</h3><div class="big {{ 'grad' if st.net >= 0 }}">{{ '+' if st.net > 0 }}{{ st.net }}</div>
+    <span class="muted">points overall</span></div>
+</div>
+{% if history %}
+<div class="card">
+  <h3>Recent hands</h3>
+  <table>
+    <tr><th>Result</th><th>You</th><th>Dealer</th><th>Net</th></tr>
+    {% for h in history %}
+    <tr><td>{{ h.label }}</td><td>{{ h.p }}</td><td>{{ h.d }}</td>
+        <td class="{{ 'plus' if h.net > 0 else ('minus' if h.net < 0) }}">{{ '+' if h.net > 0 }}{{ h.net }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<form class="box card" method="post">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="ref" value="{{ ref }}">
+  <h2>Create account</h2>
+  <label>Username (3–20 letters, digits or _)</label>
+  <input type="text" name="username" maxlength="20" required autocomplete="username">
+  <label>Password (at least 8 characters)</label>
+  <input type="password" name="password" minlength="8" maxlength="128" required autocomplete="new-password">
+  <label><input type="checkbox" name="terms" value="1" required>
+    I understand that points are virtual and accept the <a href="{{ url_for('main.rules') }}" target="_blank">rules</a>
+    and <a href="{{ url_for('main.legal') }}" target="_blank">privacy notice</a>.</label>
+  {% if ref %}<p class="muted">You were invited by a friend 🎉</p>{% endif %}
+  <p><button class="btn">Create account</button></p>
+  <p class="muted">No e-mail address is collected, so passwords cannot be recovered. Please store yours safely.</p>
+</form>
+{% endblock %}

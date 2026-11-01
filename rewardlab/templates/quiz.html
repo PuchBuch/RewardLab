@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Daily quiz{% endblock %}
+{% block content %}
+<h1>Daily <span class="grad">quiz</span></h1>
+<p class="muted">One question a day. Answer correctly to earn bonus points.</p>
+<div class="card" style="max-width:620px">
+  {% if done %}
+    <p>You have already answered today's question. Come back tomorrow!</p>
+  {% else %}
+    <h3>Question of the day</h3>
+    <h2>{{ q.q }}</h2>
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      {% for o in q.options %}
+        <button class="opt" name="choice" value="{{ loop.index0 }}">{{ o }}</button>
+      {% endfor %}
+    </form>
+  {% endif %}
+</div>
+{% endblock %}
