@@ -4,8 +4,8 @@
 
 /* ═══ Палитра ═══════════════════════════════════════════════ */
 :root{
-  --teal-700:#0F766E; --teal-600:#0D9488; --teal-400:#2DD4BF;
-  --sand-300:#E9D3A6; --sand-100:#F6EAD0; --sand-50:#FBF6EC; --dune:#C8A26B;
+  --teal-700:#38556e; --teal-600:#0D9488; --teal-400:#2DD4BF;
+  --sand-300:#e9dea6; --sand-100:#f8e7a4; --sand-50:#f2de9e; --dune:#f4dc05;
   --sky-600:#0284C7;  --sky-400:#38BDF8;  --sky-300:#7DD3FC;
   --radius:18px;
 }
