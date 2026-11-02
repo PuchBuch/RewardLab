@@ -1,15 +1,15 @@
 """Личный кабинет: дашборд, ежечасная награда, викторина, друзья."""
 
 import time
-import random
 import sqlite3
 import datetime
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash, make_response
 
 from .. import config
 from ..db import db, utc_now
-from ..security import current_user, login_required
+from ..security import current_user, login_required, too_many
+from ..services import captcha, lucky
 from ..services.points import add_points
 from ..services.referrals import active_referrals, ref_tier, credit_referrer, check_activation, invite_link
 
@@ -31,14 +31,30 @@ def dashboard():
     db().execute("UPDATE notifications SET seen = 1 WHERE user_id = ? AND seen = 0", (u["id"],))
     db().commit()
     return render_template("dashboard.html", u=u, wait=wait, refs=refs, events=events, notes=notes,
-                           link=invite_link(u),
+                           link=invite_link(u), lucky_table=lucky.table(), max_streak=config.MAX_STREAK_BONUS,
+                           roll=session.pop("last_roll", None),
                            share=int(ref_tier(active_referrals(u["id"]))[0][1] * 100))
+
+
+@bp.route("/captcha.svg")
+@login_required
+def captcha_image():
+    resp = make_response(captcha.new_svg())
+    resp.headers["Content-Type"] = "image/svg+xml"
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @bp.post("/claim")
 @login_required
 def claim():
     u   = current_user()
+    if too_many(f"captcha:{u['id']}", limit=20, window=600):
+        flash("Too many attempts. Please wait a few minutes.", "error")
+        return redirect(url_for("account.dashboard"))
+    if not captcha.check(request.form.get("captcha", "")):
+        flash("Wrong security code. Please try the new one.", "error")
+        return redirect(url_for("account.dashboard"))
     now = time.time()
     # Атомарная проверка: обновится, только если с прошлой награды прошёл час
     cur = db().execute(
@@ -57,12 +73,18 @@ def claim():
         streak = u["streak"] + 1
     else:
         streak = 1
-    reward = config.BASE_REWARD + min(streak, config.MAX_STREAK_BONUS) + random.randint(0, config.RANDOM_BONUS)
+    number = lucky.roll()
+    tier, prize = lucky.prize(number)
+    bonus  = min(streak, config.MAX_STREAK_BONUS)
+    reward = prize + bonus
     db().execute("UPDATE users SET streak = ?, last_day = ? WHERE id = ?",
                  (streak, today.isoformat(), u["id"]))
     add_points(u["id"], reward, "claim")
     credit_referrer(u, reward)
-    msg = f"+{reward} points! Streak: {streak} day(s)."
+    session["last_roll"] = {"n": number, "tier": tier, "prize": prize, "bonus": bonus}
+    msg = f"Lucky number {number}: +{prize} points, +{bonus} streak bonus ({streak} day(s))."
+    if tier == len(config.LUCKY_TIERS) - 1:
+        msg = "🎰 JACKPOT! " + msg
     if check_activation(u):
         msg += f" 🎉 You are now an active member: +{config.REF_BONUS_FRIEND} welcome bonus!"
     db().commit()

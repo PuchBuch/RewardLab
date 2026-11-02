@@ -11,6 +11,12 @@
 <p class="muted">Beat the dealer by getting closer to 21. Virtual points only, just for fun.
   <a href="{{ url_for('main.rules') }}#blackjack">Rules →</a></p>
 <div class="bj-table">
+  <div class="bj-hud">
+    <div class="main"><span>Balance</span><b>{{ points }}</b></div>
+    <div><span>Hands</span><b>{{ st.hands }}</b></div>
+    <div><span>Win rate</span><b>{{ st.rate }}%</b></div>
+    <div><span>Net</span><b class="{{ 'plus' if st.net > 0 else ('minus' if st.net < 0) }}">{{ '+' if st.net > 0 }}{{ st.net }}</b></div>
+  </div>
   <div class="hand">
     <div class="hand-label">Dealer {% if dealer %}<span class="hand-val">{{ dealer_val }}</span>{% endif %}</div>
     <div class="cards">{% for c in dealer %}{{ card(c) }}{% endfor %}</div>
@@ -38,31 +44,24 @@
   {% else %}
   <form method="post" action="{{ url_for('blackjack.action', action='deal') }}">
     <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-    <div class="chips">
-      {% for c in chips %}
-      <label><input type="radio" name="bet" value="{{ c }}" {{ 'checked' if c == sel }} {{ 'disabled' if c > points }}>
-        <span class="chip c{{ c }}">{{ c }}</span></label>
-      {% endfor %}
-    </div>
-    <div class="bj-controls">
-      <button class="btn xl" {{ 'disabled' if points < chips[0] }}>{{ 'Deal again' if outcome else 'Deal cards' }}</button>
+    <div class="bet-row">
+      <div class="chips">
+        {% for c in chips %}
+        <label><input type="radio" name="bet" value="{{ c }}" {{ 'checked' if c == sel }} {{ 'disabled' if c > points }}>
+          <span class="chip c{{ c }}">{{ c }}</span></label>
+        {% endfor %}
+      </div>
+      <button class="btn deal" {{ 'disabled' if points < chips[0] }}>{{ 'Deal again' if outcome else 'Deal cards' }}</button>
     </div>
   </form>
   {% if points < chips[0] %}
     <p class="bj-balance">Not enough points for a bet. <a href="{{ url_for('account.dashboard') }}">Claim your hourly bonus →</a></p>
   {% endif %}
   {% endif %}
-  <div class="bj-balance">Balance: <b>{{ points }}</b> points</div>
 </div>
 
-<div class="grid stats">
-  <div class="card"><h3>Hands played</h3><div class="big">{{ st.hands }}</div></div>
-  <div class="card"><h3>Win rate</h3><div class="big">{{ st.rate }}%</div></div>
-  <div class="card"><h3>Net result</h3><div class="big {{ 'grad' if st.net >= 0 }}">{{ '+' if st.net > 0 }}{{ st.net }}</div>
-    <span class="muted">points overall</span></div>
-</div>
 {% if history %}
-<div class="card">
+<div class="card" style="margin-top:20px">
   <h3>Recent hands</h3>
   <table>
     <tr><th>Result</th><th>You</th><th>Dealer</th><th>Net</th></tr>

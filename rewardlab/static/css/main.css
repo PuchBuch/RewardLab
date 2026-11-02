@@ -4,7 +4,7 @@
 
 /* ═══ Палитра ═══════════════════════════════════════════════ */
 :root{
-  --teal-700:#38556e; --teal-600:#0D9488; --teal-400:#2DD4BF;
+  --teal-700:#38556e; --teal-600:#0d7494; --teal-400:#2da2d4;
   --sand-300:#e9dea6; --sand-100:#f8e7a4; --sand-50:#f2de9e; --dune:#f4dc05;
   --sky-600:#0284C7;  --sky-400:#38BDF8;  --sky-300:#7DD3FC;
   --radius:18px;
@@ -200,6 +200,35 @@ nav form{margin:0}
 .timer{font-size:clamp(40px,8vw,64px);font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:6px 0 22px;line-height:1}
 .timer.ready{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 
+/* ═══ Счастливое число ══════════════════════════════════════ */
+[hidden]{display:none!important}
+/* Одна карточка: слева бросок (результат, таймер, капча, кнопка), справа таблица призов */
+.lucky-panel{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);padding:0;margin:20px 0;text-align:left}
+.lucky-play{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 24px;text-align:center}
+.lucky-side{padding:22px 24px;border-left:1px solid var(--line)}
+.lucky-play .timer{font-size:clamp(36px,6vw,52px);margin:2px 0 16px}
+.lucky-form{width:100%;max-width:300px}
+.lucky-form .btn.xl{width:100%;padding:14px 20px}
+.roll-result{display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;width:100%;
+  margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed var(--line-hi)}
+.roll-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lucky-number{padding:2px 12px;border-radius:10px;background:var(--sand-soft);border:1px solid var(--line-hi);
+  font-size:28px;font-weight:800;letter-spacing:.1em;font-variant-numeric:tabular-nums;color:var(--text)}
+.lucky-number.done{animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+.roll-prize{font-size:20px;font-weight:800;color:var(--ok)}
+.roll-prize small{font-size:13px;font-weight:600;color:var(--muted)}
+.captcha-box{margin:0 0 12px}
+.captcha-row{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px}
+.captcha{display:block;width:180px;height:56px;border-radius:10px;border:1px solid var(--line-hi);background:#F6EAD0}
+.captcha-box input{text-align:center;font-size:20px;letter-spacing:.35em;font-weight:700;padding:10px 12px}
+.captcha-box input::placeholder{letter-spacing:normal;font-size:15px;font-weight:500}
+.lucky-table{margin-bottom:10px}
+.lucky-table td,.lucky-table th{padding:7px 10px;font-size:14px}
+.lucky-table td:last-child{text-align:right}
+.lucky-table tr.hit td{background:var(--primary-soft);color:var(--text);font-weight:700}
+.lucky-table tr.hit td:first-child{box-shadow:inset 3px 0 0 var(--primary)}
+.lucky-side .muted{margin:0;font-size:13px}
+
 /* ═══ Таблицы ═══════════════════════════════════════════════ */
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
@@ -280,7 +309,7 @@ form.box .btn{width:100%;margin-top:8px}
 .actions-grid .btn{width:100%}
 
 /* ═══ Блэкджек (собственный стиль, не зависит от темы) ══════ */
-.bj-table{position:relative;margin-top:20px;padding:30px 16px 26px;border-radius:32px;overflow:hidden;
+.bj-table{position:relative;margin-top:20px;padding:20px 16px 18px;border-radius:32px;overflow:hidden;
   background:radial-gradient(ellipse 120% 90% at 50% 35%,#1f8a5f 0%,#13603f 50%,#0b3f2a 100%);
   box-shadow:0 30px 60px -25px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 0 80px rgba(0,0,0,.35)}
 .bj-table::before{content:"";position:absolute;inset:12px;border-radius:24px;border:2px solid rgba(255,255,255,.07);pointer-events:none}
@@ -289,35 +318,44 @@ form.box .btn{width:100%;margin-top:8px}
 .bj-table .btn.ghost{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.3);color:#fff;box-shadow:none}
 .bj-table .btn.gold{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#2a1a00;box-shadow:0 8px 30px -8px rgba(245,158,11,.6)}
 .bj-table .btn:disabled{background:rgba(255,255,255,.12);color:rgba(255,255,255,.5);box-shadow:none}
+.bj-hud{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:6px auto 4px;color:#fff}
+.bj-hud div{display:flex;align-items:baseline;gap:7px;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.25)}
+.bj-hud span{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.bj-hud b{font-size:15px;font-variant-numeric:tabular-nums}
+.bj-hud .main{background:rgba(0,0,0,.4);box-shadow:inset 0 0 0 1px rgba(253,230,138,.35)}
+.bj-hud .main b{color:#fde68a}
+.bj-hud b.plus{color:#6ee7b7}.bj-hud b.minus{color:#fca5a5}
 .hand{position:relative;text-align:center}
-.hand-label{display:flex;gap:8px;align-items:center;justify-content:center;margin:12px 0;color:rgba(255,255,255,.85);
+.hand-label{display:flex;gap:8px;align-items:center;justify-content:center;margin:6px 0;color:rgba(255,255,255,.85);
   font-weight:600;font-size:14px}
 .hand-val{background:rgba(0,0,0,.35);color:#fff;border-radius:99px;padding:2px 11px;font-weight:800;font-variant-numeric:tabular-nums}
-.bet-chip{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#f59e0b;color:#fff;
-  font-size:12px;font-weight:800;border:3px dashed rgba(255,255,255,.6)}
-.cards{display:flex;justify-content:center;min-height:116px;padding:0 10px}
-.pcard{position:relative;flex:none;width:78px;height:112px;margin-left:-24px;border-radius:11px;background:#fff;color:#1f2133;
+.bet-chip{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#f59e0b;color:#fff;
+  font-size:11px;font-weight:800;border:3px dashed rgba(255,255,255,.6)}
+.cards{display:flex;justify-content:center;min-height:102px;padding:0 10px}
+.pcard{position:relative;flex:none;width:70px;height:100px;margin-left:-22px;border-radius:10px;background:#fff;color:#1f2133;
   box-shadow:0 8px 18px rgba(0,0,0,.35);font-weight:800;user-select:none}
 .pcard:first-child{margin-left:0}
 .pcard.red{color:#e0384b}
 .pcard .tl,.pcard .br{position:absolute;font-size:15px;line-height:1.05;text-align:center}
 .pcard .tl{top:7px;left:8px}
 .pcard .br{bottom:7px;right:8px;transform:rotate(180deg)}
-.pcard .mid{position:absolute;inset:0;display:grid;place-items:center;font-size:34px}
+.pcard .mid{position:absolute;inset:0;display:grid;place-items:center;font-size:30px}
 .pcard.back{background:repeating-linear-gradient(45deg,#8b5cf6 0 7px,#7448e0 7px 14px);border:5px solid #fff}
 .pcard.deal{animation:deal .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--d) * 160ms)}
 @keyframes deal{from{opacity:0;transform:translate(140px,-160px) rotate(18deg) scale(.7)}to{opacity:1;transform:none}}
-.felt-text{margin:18px 0;text-align:center;color:rgba(255,255,255,.35);font-size:11px;font-weight:700;letter-spacing:.18em}
-.result{width:fit-content;max-width:100%;margin:16px auto;padding:10px 22px;border-radius:16px;background:rgba(0,0,0,.4);
-  color:#fff;font-size:20px;font-weight:800;text-align:center;animation:pop .45s .35s cubic-bezier(.2,1.4,.4,1) both}
-.result small{display:block;font-size:13px;font-weight:600;opacity:.8}
+.felt-text{display:grid;place-items:center;min-height:53px;margin:6px 0;text-align:center;color:rgba(255,255,255,.35);font-size:11px;font-weight:700;letter-spacing:.18em}
+.result{width:fit-content;max-width:100%;min-height:53px;margin:6px auto;padding:6px 20px;border-radius:14px;background:rgba(0,0,0,.4);
+  color:#fff;font-size:18px;font-weight:800;text-align:center;animation:pop .45s .35s cubic-bezier(.2,1.4,.4,1) both}
+.result small{display:block;font-size:12px;font-weight:600;opacity:.8}
 .result.win{color:#6ee7b7}.result.lose{color:#fca5a5}.result.push{color:#fde68a}
 @keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
-.bj-controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:22px 0 8px}
+.bj-controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0 0}
 .bj-controls .btn{min-width:120px}
-.chips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:6px 0 4px}
+.bet-row{display:flex;gap:10px 20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.bet-row .btn.deal{min-width:150px;padding:14px 26px;font-size:16px}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding-top:7px}
 .chips input{position:absolute;opacity:0;pointer-events:none}
-.chip{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;cursor:pointer;
+.chip{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;color:#fff;font-weight:800;font-size:14px;cursor:pointer;
   border:4px dashed rgba(255,255,255,.6);box-shadow:0 5px 0 rgba(0,0,0,.35),inset 0 0 0 4px rgba(0,0,0,.15);
   transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
 .chip.c5{background:#ef4444}.chip.c10{background:#3b82f6}.chip.c25{background:#16a34a}
@@ -325,7 +363,7 @@ form.box .btn{width:100%;margin-top:8px}
 .chips input:checked + .chip{transform:translateY(-7px);box-shadow:0 0 0 3px #fff,0 12px 22px rgba(0,0,0,.45)}
 .chips input:disabled + .chip{opacity:.3;cursor:not-allowed}
 .chips input:focus-visible + .chip{outline:2px solid #22d3ee;outline-offset:3px}
-.bj-balance{text-align:center;color:rgba(255,255,255,.8);font-size:14px;margin-top:6px}
+.bj-balance{text-align:center;color:rgba(255,255,255,.8);font-size:14px;margin:10px 0 0}
 
 button,.btn,.opt,a{touch-action:manipulation}
 
@@ -379,13 +417,23 @@ button,.btn,.opt,a{touch-action:manipulation}
   .rules aside::-webkit-scrollbar{display:none}
   .rules aside a{white-space:nowrap;background:var(--surface);border:1px solid var(--line);font-size:13px}
   .rules h2{font-size:18px}
-  .bj-table{padding:24px 6px 20px;border-radius:24px}
-  .pcard{width:62px;height:90px;margin-left:-20px;border-radius:9px}
-  .pcard .tl,.pcard .br{font-size:13px}
-  .pcard .mid{font-size:26px}
-  .cards{min-height:94px}
-  .chip{width:52px;height:52px;font-size:14px}
-  .chips{gap:8px}
+  .lucky-panel{grid-template-columns:1fr;padding:0}
+  .lucky-play{padding:22px 16px 18px}
+  .lucky-side{padding:16px;border-left:0;border-top:1px solid var(--line)}
+  .lucky-number{font-size:24px}
+  .bj-table{padding:16px 6px 16px;border-radius:24px}
+  .bj-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 10px}
+  .bj-hud div{flex-direction:column;align-items:center;gap:1px;padding:5px 2px;border-radius:12px}
+  .bj-hud span{font-size:8.5px;letter-spacing:.06em}
+  .bj-hud b{font-size:14px}
+  .pcard{width:58px;height:84px;margin-left:-18px;border-radius:9px}
+  .pcard .tl,.pcard .br{font-size:12px}
+  .pcard .mid{font-size:24px}
+  .cards{min-height:86px}
+  .chip{width:48px;height:48px;font-size:13px}
+  .chips{gap:7px}
+  .bet-row{padding:0 12px}
+  .bet-row .btn.deal{flex:1;min-width:0}
   .bj-controls{gap:8px;padding:0 12px}
   .bj-controls .btn{flex:1;min-width:0;padding:13px 8px;white-space:nowrap}
   .felt-text{font-size:9px;letter-spacing:.1em;padding:0 16px}

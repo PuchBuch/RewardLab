@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request
 
 from .. import config
 from ..db import db, utc_now
-from ..services import contest
+from ..services import contest, lucky
 
 bp = Blueprint("main", __name__)
 
@@ -20,7 +20,7 @@ def home():
         "points": d.execute("SELECT COALESCE(SUM(amount), 0) FROM events WHERE amount > 0").fetchone()[0],
     }
     return render_template("home.html", stats=stats, share=int(config.REF_TIERS[-1][1] * 100),
-                           quiz=config.QUIZ_REWARD)
+                           quiz=config.QUIZ_REWARD, jackpot=config.LUCKY_TIERS[-1][1])
 
 
 @bp.route("/leaderboard")
@@ -54,8 +54,8 @@ def leaderboard():
 @bp.route("/rules")
 def rules():
     return render_template(
-        "rules.html", cooldown=config.CLAIM_COOLDOWN // 60, base=config.BASE_REWARD,
-        max_streak=config.MAX_STREAK_BONUS, rand=config.RANDOM_BONUS, quiz=config.QUIZ_REWARD,
+        "rules.html", cooldown=config.CLAIM_COOLDOWN // 60, lucky_table=lucky.table(),
+        max_streak=config.MAX_STREAK_BONUS, quiz=config.QUIZ_REWARD,
         tiers=config.REF_TIERS, claims_needed=config.REF_ACTIVATION_CLAIMS,
         bonus_inviter=config.REF_BONUS_INVITER, bonus_friend=config.REF_BONUS_FRIEND,
         prizes=config.CONTEST_PRIZES, per_net=config.REG_PER_NETWORK_DAY,

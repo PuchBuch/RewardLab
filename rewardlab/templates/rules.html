@@ -6,7 +6,7 @@
 <div class="rules" style="margin-top:24px">
   <aside>
     <a href="#points">Virtual points</a>
-    <a href="#hourly">Hourly bonus &amp; streak</a>
+    <a href="#hourly">Lucky number &amp; streak</a>
     <a href="#quiz">Daily quiz</a>
     <a href="#blackjack">Blackjack</a>
     <a href="#referral">Referral program</a>
@@ -24,13 +24,23 @@
     </section>
 
     <section id="hourly" class="card">
-      <h2>⏱ Hourly bonus &amp; daily streak</h2>
+      <h2>🎲 Hourly lucky number &amp; daily streak</h2>
       <ul>
-        <li>You can claim a bonus once every <b>{{ cooldown }} minutes</b>.</li>
-        <li>Reward = <b>{{ base }}</b> base points + <b>streak bonus</b> (1 point per day in a row, up to {{ max_streak }})
-            + a random bonus of <b>0–{{ rand }}</b>.</li>
-        <li>Your streak grows when you claim at least once per day (days are counted in UTC).
+        <li>Once every <b>{{ cooldown }} minutes</b> you can roll a lucky number from <b>0 to {{ lucky_table[-1].end }}</b>.
+            Before each roll you type a 5-digit security code from a picture, to keep bots out.</li>
+        <li>The number decides your prize:</li>
+      </ul>
+      <table class="lucky-table" style="max-width:420px;margin:8px 0 12px">
+        <tr><th>Lucky number</th><th>Points</th></tr>
+        {% for t in lucky_table %}
+        <tr><td>{{ t.start }}{% if t.end != t.start %} – {{ t.end }}{% endif %}{% if loop.last %} 🎰{% endif %}</td><td><b>+{{ t.amount }}</b></td></tr>
+        {% endfor %}
+      </table>
+      <ul>
+        <li>On top of the prize you get a <b>streak bonus</b>: 1 point per day in a row, up to {{ max_streak }}.</li>
+        <li>Your streak grows when you roll at least once per day (days are counted in UTC).
             Missing a full day resets it to 1.</li>
+        <li>Numbers are drawn on the server with a cryptographically secure random generator. Every number is equally likely.</li>
       </ul>
     </section>
 
