@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard{% endblock %}
+{% block content %}
+<h1>Leader<span class="grad">board</span></h1>
+<div class="tabs">
+  <a class="{{ 'on' if tab == 'points' }}" href="?tab=points">Points</a>
+  <a class="{{ 'on' if tab == 'inviters' }}" href="?tab=inviters">Top inviters</a>
+  <a class="{{ 'on' if tab == 'week' }}" href="?tab=week">Weekly contest</a>
+</div>
+{% if tab == 'week' %}
+<div class="grid">
+  <div class="card"><h3>Prizes</h3>
+    <div class="tiers">{% for p in prizes %}<div><b>+{{ p }}</b>#{{ loop.index }} place</div>{% endfor %}</div></div>
+  <div class="card"><h3>Ends in</h3><div class="big">{{ left_d }}d {{ left_h }}h</div>
+    <span class="muted">Every Monday 00:00 UTC prizes are credited automatically.</span></div>
+</div>
+<p class="muted">Ranking by friends who became <b>active</b> this week. <a href="{{ url_for('main.rules') }}#contest">Contest rules →</a></p>
+{% elif tab == 'inviters' %}
+<p class="muted">All-time ranking by number of active friends.</p>
+{% else %}
+<p class="muted">Top 20 members by points.</p>
+{% endif %}
+<div class="card">
+  <table>
+    <tr><th>Rank</th><th>Member</th><th>{{ col }}</th>{% if tab == 'week' %}<th>Prize</th>{% endif %}</tr>
+    {% for r in rows %}
+    <tr><td><span class="rank">{{ loop.index }}</span></td><td>{{ r.username }}</td><td><b>{{ r.value }}</b></td>
+      {% if tab == 'week' %}<td class="plus">{% if loop.index0 < prizes|length %}+{{ prizes[loop.index0] }}{% endif %}</td>{% endif %}</tr>
+    {% endfor %}
+  </table>
+  {% if not rows %}<p class="muted">{{ empty }}</p>{% endif %}
+</div>
+{% if tab == 'week' and last %}
+<div class="card" style="margin-top:16px">
+  <h3>Last week's winners</h3>
+  <table>
+    {% for r in last %}<tr><td>#{{ r.place }}</td><td>{{ r.username }}</td><td class="plus">+{{ r.amount }}</td></tr>{% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}

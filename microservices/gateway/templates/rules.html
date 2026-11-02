@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}How it works{% endblock %}
+{% block content %}
+<h1>How it <span class="grad">works</span></h1>
+<p class="muted">Everything about points, the referral program, the weekly contest, the rules and your responsibilities.</p>
+<div class="rules" style="margin-top:24px">
+  <aside>
+    <a href="#points">Virtual points</a>
+    <a href="#hourly">Lucky number &amp; streak</a>
+    <a href="#quiz">Daily quiz</a>
+    <a href="#blackjack">Blackjack</a>
+    <a href="#referral">Referral program</a>
+    <a href="#contest">Weekly contest</a>
+    <a href="#notifications">Notifications</a>
+    <a href="#fair">Fair play rules</a>
+    <a href="#you">Your responsibilities</a>
+    <a href="#us">Our responsibilities</a>
+  </aside>
+  <div>
+    <section id="points" class="card">
+      <h2>💎 Virtual points</h2>
+      <p>RewardLab is a demo of reward mechanics. Points are <b>virtual</b>: they have no monetary value
+         and cannot be bought, sold, exchanged, transferred or withdrawn. There are no deposits and no real-world prizes.</p>
+    </section>
+
+    <section id="hourly" class="card">
+      <h2>🎲 Hourly lucky number &amp; daily streak</h2>
+      <ul>
+        <li>Once every <b>{{ cooldown }} minutes</b> you can roll a lucky number from <b>0 to {{ lucky_table[-1].end }}</b>.
+            Before each roll you type a 5-digit security code from a picture, to keep bots out.</li>
+        <li>The number decides your prize:</li>
+      </ul>
+      <table class="lucky-table" style="max-width:420px;margin:8px 0 12px">
+        <tr><th>Lucky number</th><th>Points</th></tr>
+        {% for t in lucky_table %}
+        <tr><td>{{ t.start }}{% if t.end != t.start %} – {{ t.end }}{% endif %}{% if loop.last %} 🎰{% endif %}</td><td><b>+{{ t.amount }}</b></td></tr>
+        {% endfor %}
+      </table>
+      <ul>
+        <li>On top of the prize you get a <b>streak bonus</b>: 1 point per day in a row, up to {{ max_streak }}.</li>
+        <li>Your streak grows when you roll at least once per day (days are counted in UTC).
+            Missing a full day resets it to 1.</li>
+        <li>Numbers are drawn on the server with a cryptographically secure random generator. Every number is equally likely.</li>
+      </ul>
+    </section>
+
+    <section id="quiz" class="card">
+      <h2>🧠 Daily quiz</h2>
+      <ul>
+        <li>One German vocabulary question per day (UTC), <b>one attempt</b>.</li>
+        <li>A correct answer gives <b>+{{ quiz }}</b> points.</li>
+      </ul>
+    </section>
+
+    <section id="blackjack" class="card">
+      <h2>🃏 Blackjack</h2>
+      <p>A friendly card game against the dealer, played with your <b>virtual points</b>. Points cannot be bought or
+         withdrawn, so you can never win or lose real money. Play for fun and take breaks.</p>
+      <ul>
+        <li>Pick a bet: {% for c in chips %}<b>{{ c }}</b>{{ ", " if not loop.last }}{% endfor %} points. The bet is taken when the cards are dealt.</li>
+        <li>Goal: get closer to <b>21</b> than the dealer without going over. Number cards count as their value,
+            J/Q/K as 10, Ace as 1 or 11.</li>
+        <li><b>Hit</b> takes a card, <b>Stand</b> ends your turn, <b>Double</b> (only on your first two cards)
+            doubles the bet and takes exactly one more card.</li>
+        <li>The dealer draws to 16 and <b>stands on all 17s</b>.</li>
+        <li>Blackjack (Ace + 10-value card) pays <b>3 to 2</b>. A regular win pays <b>1 to 1</b>. A tie (push) returns your bet.</li>
+        <li>Cards come from a freshly shuffled {{ decks }}-deck shoe every hand. Everything is decided on the server.</li>
+        <li>Blackjack winnings do <b>not</b> count toward referral shares or the weekly contest.</li>
+      </ul>
+    </section>
+
+    <section id="referral" class="card">
+      <h2>🤝 Referral program</h2>
+      <p>Share your personal invite link from the <b>Friends</b> page. A friend who signs up with it becomes your referral.</p>
+      <ul>
+        <li>Every time your friend claims a bonus or answers the quiz correctly, you get a <b>share</b> of their reward
+            on top. Their reward is <b>never reduced</b>.</li>
+        <li>After their <b>{{ claims_needed }}rd hourly claim</b> the friend becomes <b>active</b>:
+            you get <b>+{{ bonus_inviter }}</b>, the friend gets a <b>+{{ bonus_friend }}</b> welcome bonus. This happens once per friend.</li>
+        <li>Your share depends on how many <b>active</b> friends you have:</li>
+      </ul>
+      <div class="tiers">
+        {% for t in tiers %}<div><b>{{ (t[1] * 100)|int }}%</b>{{ t[2] }} · {{ t[0] }}+ active friends</div>{% endfor %}
+      </div>
+      <p>There is only one level: you earn from friends you invited yourself, not from their invitees.
+         Referral bonuses do not generate further referral bonuses.</p>
+    </section>
+
+    <section id="contest" class="card">
+      <h2>🏆 Weekly invite contest</h2>
+      <ul>
+        <li>The week runs from <b>Monday 00:00</b> to <b>Sunday 23:59 UTC</b>.</li>
+        <li>You score one point for each invited friend who <b>becomes active</b> during the week.
+            Friends who only sign up do not count.</li>
+        <li>Prizes: {% for p in prizes %}<b>#{{ loop.index }} +{{ p }}</b>{{ ", " if not loop.last }}{% endfor %} points.</li>
+        <li>On a tie, the member who reached the score first ranks higher.</li>
+        <li>Prizes are credited automatically at the start of the next week, and winners get a notification.</li>
+        <li>Live standings: <a href="{{ url_for('main.leaderboard', tab='week') }}">Leaderboard → Weekly contest</a>.</li>
+      </ul>
+    </section>
+
+    <section id="notifications" class="card">
+      <h2>🔔 Notifications</h2>
+      <p>You get a notification on your dashboard when a friend joins with your link, when a friend becomes active,
+         when you reach a new referral level and when you win a prize in the weekly contest.
+         The badge next to <b>Dashboard</b> shows how many are unread.</p>
+    </section>
+
+    <section id="fair" class="card warn">
+      <h2>⚖️ Fair play rules</h2>
+      <ul>
+        <li><b>One account per person.</b> Creating extra accounts to invite yourself is not allowed.</li>
+        <li>An invite from the <b>same network</b> (IP address) as the inviter does not count:
+            the account is created, but without a referral.</li>
+        <li>At most <b>{{ per_net }} new accounts</b> can be created from one network in 24 hours.</li>
+        <li>No bots, scripts or any automation to claim bonuses, answer the quiz, play blackjack or create accounts.</li>
+        <li>Do not spam your invite link or post it where it is unwelcome.</li>
+        <li>No offensive, misleading or impersonating usernames.</li>
+        <li>Points cannot be traded. Any offers to buy or sell points or accounts are against the rules.</li>
+      </ul>
+      <p>Breaking these rules may lead to points being reset, referral bonuses being removed or the account being deleted.</p>
+    </section>
+
+    <section id="you" class="card">
+      <h2>🙋 Your responsibilities</h2>
+      <ul>
+        <li>Keep your password safe. No e-mail is collected, so a <b>lost password cannot be recovered</b>.</li>
+        <li>Use only your own account and do not share it.</li>
+        <li>Follow the fair play rules above.</li>
+        <li>Invite only people who actually want to join.</li>
+        <li>Report bugs instead of exploiting them.</li>
+      </ul>
+    </section>
+
+    <section id="us" class="card">
+      <h2>🛡 Our responsibilities</h2>
+      <ul>
+        <li>Store only the minimum data needed. See the <a href="{{ url_for('main.legal') }}">privacy notice</a>.</li>
+        <li>Never ask you for money, payment details or personal documents.</li>
+        <li>Let you delete your account and all its data at any time from the dashboard.</li>
+        <li>Keep this page up to date: the numbers shown here are always the current settings.
+            Rules and rewards may change, as this is a demo.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

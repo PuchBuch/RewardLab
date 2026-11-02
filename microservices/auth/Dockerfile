@@ -1,0 +1,12 @@
+# Сборка из папки microservices/:  docker build -f auth/Dockerfile -t rewardlab-auth .
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt && useradd --create-home app && mkdir /data && chown app /data
+COPY common ./common
+COPY auth ./auth
+USER app
+ENV HOST=0.0.0.0 DATA_DIR=/data PYTHONUNBUFFERED=1
+EXPOSE 5001
+HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/health')"
+CMD ["python", "-m", "auth.app"]

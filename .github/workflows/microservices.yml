@@ -1,0 +1,47 @@
+name: microservices
+
+on:
+  push:
+    paths: ["microservices/**", ".github/workflows/microservices.yml"]
+  pull_request:
+    paths: ["microservices/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: microservices
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m tests.test_flow
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: microservices
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env for the smoke test
+        run: |
+          echo "APP_SECRET=$(openssl rand -hex 32)" > .env
+          echo "INTERNAL_TOKEN=$(openssl rand -hex 32)" >> .env
+      - run: docker compose up --build -d
+      - name: Wait for gateway and open pages
+        run: |
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:5000/health && break; sleep 2; done
+          curl -fs http://127.0.0.1:5000/ > /dev/null
+          curl -fs http://127.0.0.1:5000/rules > /dev/null
+          curl -fs http://127.0.0.1:5000/leaderboard > /dev/null
+      - if: failure()
+        run: docker compose logs
+      - run: docker compose down -v

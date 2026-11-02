@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- RewardLab: небо над оазисом, солнце-монета и песчаные дюны -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="dune-back" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E9D3A6"/>
+      <stop offset="1" stop-color="#C8A26B"/>
+    </linearGradient>
+    <linearGradient id="dune-front" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F6EAD0"/>
+      <stop offset="1" stop-color="#E9D3A6"/>
+    </linearGradient>
+    <clipPath id="tile"><rect width="64" height="64" rx="15"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="url(#sky)"/>
+    <circle cx="41" cy="22" r="10" fill="#FDF3DC"/>
+    <circle cx="41" cy="22" r="6.5" fill="none" stroke="#E9C77F" stroke-width="2"/>
+    <path d="M-2 42 C12 33 25 33 37 41 C46 47 55 45 66 38 V66 H-2Z" fill="url(#dune-back)"/>
+    <path d="M-2 52 C11 45 23 46 33 52 C43 58 54 56 66 50 V66 H-2Z" fill="url(#dune-front)"/>
+  </g>
+</svg>

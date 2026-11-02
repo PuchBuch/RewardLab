@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="pill">New lucky number every hour</div>
+  <h1>Earn points,<br><span class="grad">one hour at a time</span></h1>
+  <p>Claim a bonus every hour, build a daily streak, invite friends and climb the leaderboard.
+     Points are virtual: this is a demo of the mechanics.</p>
+  <div class="actions">
+    {% if user %}
+      <a class="btn" href="{{ url_for('account.dashboard') }}">Go to dashboard</a>
+    {% else %}
+      <a class="btn" href="{{ url_for('auth.register') }}">Create free account</a>
+      <a class="btn ghost" href="{{ url_for('auth.login') }}">Log in</a>
+    {% endif %}
+  </div>
+</section>
+<div class="grid stats">
+  <div class="card center"><h3>Members</h3><div class="big">{{ stats.users }}</div></div>
+  <div class="card center"><h3>Bonuses claimed</h3><div class="big">{{ stats.claims }}</div></div>
+  <div class="card center"><h3>Points awarded</h3><div class="big">{{ stats.points }}</div></div>
+</div>
+<div class="grid">
+  <div class="card feature"><span class="ico">🎲</span><h3>Hourly lucky number</h3>Roll a number every hour. The rarer the number, the bigger the prize, up to a {{ jackpot }}-point jackpot.</div>
+  <div class="card feature"><span class="ico">🔥</span><h3>Streak bonus</h3>Come back every day: the longer the streak, the bigger the reward.</div>
+  <div class="card feature"><span class="ico">🤝</span><h3>Invite friends</h3>Get up to {{ share }}% of everything your friends earn, plus a bonus when they become active. Their rewards are not reduced.</div>
+  <div class="card feature"><span class="ico">🧠</span><h3>Daily quiz</h3>One German vocabulary question a day, +{{ quiz }} points for a correct answer.</div>
+  <div class="card feature"><span class="ico">🃏</span><h3>Blackjack</h3>Try your luck against the dealer with your points. Just for fun: points are never real money.</div>
+</div>
+{% endblock %}

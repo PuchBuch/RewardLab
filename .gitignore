@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 rewards.db
+microservices/data/
+microservices/logs/

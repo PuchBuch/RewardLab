@@ -1,0 +1,48 @@
+# Запуск всех сервисов: docker compose up --build   →   http://127.0.0.1:5000
+# Наружу открыт только gateway; остальные сервисы видны лишь во внутренней сети.
+
+x-service: &service
+  env_file: .env
+  environment:
+    AUTH_URL: http://auth:5001
+    WALLET_URL: http://wallet:5002
+    GAMES_URL: http://games:5003
+    COMMUNITY_URL: http://community:5004
+  restart: unless-stopped
+  networks: [internal]
+
+services:
+  auth:
+    <<: *service
+    build: { context: ., dockerfile: auth/Dockerfile }
+    volumes: [auth-data:/data]
+
+  wallet:
+    <<: *service
+    build: { context: ., dockerfile: wallet/Dockerfile }
+    volumes: [wallet-data:/data]
+
+  games:
+    <<: *service
+    build: { context: ., dockerfile: games/Dockerfile }
+    volumes: [games-data:/data]
+
+  community:
+    <<: *service
+    build: { context: ., dockerfile: community/Dockerfile }
+    volumes: [community-data:/data]
+
+  gateway:
+    <<: *service
+    build: { context: ., dockerfile: gateway/Dockerfile }
+    ports: ["127.0.0.1:5000:5000"]
+    depends_on: [auth, wallet, games, community]
+
+networks:
+  internal:
+
+volumes:
+  auth-data:
+  wallet-data:
+  games-data:
+  community-data:

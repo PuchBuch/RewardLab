@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin verification{% endblock %}
+{% block content %}
+<form class="box card" method="post">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <h2>🔐 Admin verification</h2>
+  <p class="muted">Confirm it is you: enter your password and the 6-digit code from your authenticator app.</p>
+  <label>Password</label>
+  <input type="password" name="password" maxlength="128" required autocomplete="current-password">
+  <label>Authenticator code</label>
+  <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code">
+  <p><button class="btn">Verify</button></p>
+  <p class="muted">The admin session ends after {{ ttl }} minutes of inactivity. All actions are logged.</p>
+</form>
+{% endblock %}

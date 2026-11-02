@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Hi, <span class="grad">{{ u.username }}</span></h1>
+<p class="muted">Here is how you are doing today.</p>
+{% if notes %}
+<div class="card" style="margin-top:20px">
+  <h3>Notifications</h3>
+  {% for n in notes %}
+    <div class="note {{ 'new' if not n.seen }}">{{ n.text }}<span>{{ n.at[:16].replace('T', ' ') }} UTC</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+<div class="grid stats">
+  <div class="card"><h3>Points</h3><div class="big grad">{{ u.points }}</div></div>
+  <div class="card"><h3>Daily streak</h3><div class="big">{{ u.streak }} 🔥</div><span class="muted">days in a row</span></div>
+  <div class="card"><h3>Friends invited</h3><div class="big">{{ refs }}</div></div>
+</div>
+<div class="card claim lucky-panel">
+  <div class="lucky-play">
+    {% if roll %}
+    <div class="roll-result">
+      <span class="roll-label">Your number</span>
+      <span class="lucky-number" data-roll="{{ roll.n }}">{{ '%05d' % roll.n }}</span>
+      <span class="roll-prize">+{{ roll.prize }}<small> + {{ roll.bonus }} streak</small></span>
+    </div>
+    {% endif %}
+    <h3 id="label">Next roll in</h3>
+    <div id="timer" class="timer" data-wait="{{ wait }}">--:--</div>
+    <form class="lucky-form" method="post" action="{{ url_for('account.claim') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <div id="captcha-box" class="captcha-box" hidden>
+        <div class="captcha-row">
+          <img id="captcha" class="captcha" alt="Security code: five digits" width="180" height="56"
+               data-src="{{ url_for('account.captcha_image') }}">
+          <button type="button" class="icon-btn" data-captcha-refresh aria-label="Show a new code">↻</button>
+        </div>
+        <input id="captcha-input" type="text" name="captcha" inputmode="numeric" pattern="[0-9]{5}" maxlength="5"
+               autocomplete="off" required placeholder="5 digits" aria-label="Enter the 5 digits from the picture">
+      </div>
+      <button id="claim" class="btn xl" {% if wait > 0 %}disabled{% endif %}>🎲 Roll the number</button>
+    </form>
+  </div>
+  <div class="lucky-side">
+    <h3>Prizes</h3>
+    <table class="lucky-table">
+      {% for t in lucky_table %}
+      <tr class="{{ 'hit' if roll and roll.tier == loop.index0 }}">
+        <td>{{ t.start }}{% if t.end != t.start %}–{{ t.end }}{% endif %}{% if loop.last %} 🎰{% endif %}</td>
+        <td><b>+{{ t.amount }}</b></td></tr>
+      {% endfor %}
+    </table>
+    <p class="muted">Number from 0 to {{ lucky_table[-1].end }} every hour, plus up to +{{ max_streak }} for your streak.
+      <a href="{{ url_for('main.rules') }}#hourly">Rules →</a></p>
+  </div>
+</div>
+<div class="grid">
+  <div class="card">
+    <h3>Your invite link</h3>
+    <input type="text" readonly value="{{ link }}" onclick="this.select()">
+    <p class="muted">You earn {{ share }}% of your friends' rewards, on top of theirs.
+       <a href="{{ url_for('account.referrals') }}">Referral program →</a></p>
+  </div>
+  <div class="card">
+    <h3>Recent activity</h3>
+    {% if events %}
+    <table>{% for e in events %}
+      <tr><td>{{ e.kind }}</td><td class="{{ 'plus' if e.amount > 0 else 'minus' }}">{{ '+' if e.amount > 0 }}{{ e.amount }}</td>
+          <td class="muted">{{ e.at[:16].replace('T', ' ') }}</td></tr>
+    {% endfor %}</table>
+    {% else %}<p class="muted">Nothing yet. Make your first claim!</p>{% endif %}
+  </div>
+</div>
+<form method="post" action="{{ url_for('auth.delete_account') }}" onsubmit="return confirm('Delete your account and all data?');">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <button class="btn danger">Delete my account and data</button>
+</form>
+{% endblock %}

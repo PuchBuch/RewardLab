@@ -1,0 +1,6 @@
+.env
+data/
+logs/
+tests/
+**/__pycache__/
+**/*.pyc

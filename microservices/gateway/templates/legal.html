@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Privacy{% endblock %}
+{% block content %}
+<h1>Privacy</h1>
+<p class="muted">The full rules are on the <a href="{{ url_for('main.rules') }}">How it works</a> page.</p>
+<div class="card">
+  <h3>Virtual points</h3>
+  <p>This is a portfolio demo. Points are virtual, have no monetary value and cannot be bought,
+     sold, exchanged or withdrawn. There are no deposits, wallets or real-world prizes: contest prizes are points too.</p>
+  <h3>Data we store</h3>
+  <p>Username, a hashed password (never the password itself), points, activity history and notifications.
+     To limit fake accounts we also store a one-way hash of the IP address used at sign-up: the address
+     itself is not stored and cannot be recovered from the hash.
+     No e-mail address, no real name, no tracking or advertising.</p>
+  <h3>Delete your data</h3>
+  <p>You can delete your account and all its data at any time from the dashboard.</p>
+</div>
+{% endblock %}

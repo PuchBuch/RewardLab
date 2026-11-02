@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="box card" style="text-align:center">
+  <h1 class="grad">{{ code }}</h1>
+  <h2>{{ title }}</h2>
+  <p class="muted">{{ text }}</p>
+  <p><a class="btn" href="{{ url_for('main.home') }}">Back to home</a></p>
+</div>
+{% endblock %}
